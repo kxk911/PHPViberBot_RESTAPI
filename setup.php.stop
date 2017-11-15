@@ -1,0 +1,14 @@
+<?php
+if( $curl = curl_init() ) {
+    curl_setopt($curl, CURLOPT_URL, 'https://chatapi.viber.com/pa/set_webhook');
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER,true);
+    curl_setopt($curl, CURLOPT_POST, true);
+	curl_setopt($curl,CURLOPT_HTTPHEADER, array(
+		'X-Viber-Auth-Token: 4518fb349512ad77-46616d87c3236993-1d149c51b0672ad4'
+	));
+    curl_setopt($curl, CURLOPT_POSTFIELDS, '{"url": "https://viberbot.ehost.tj/index.php/core/bot","event_types": ["delivered", "seen", "failed", "subscribed", "unsubscribed", "conversation_started"] }');
+    $out = curl_exec($curl);
+    echo $out;
+    curl_close($curl);
+  }
+?>

@@ -1,0 +1,220 @@
+<?php
+	define("TOKEN", "45bddeff80b252f6-7b08062ca4eb0543-c8b9435396fd04c4");
+	define("GATE_SET_WEBHOOK", "https://chatapi.viber.com/pa/set_webhook");
+	define("GATE_SEND_MESSAGE", "https://chatapi.viber.com/pa/send_message");
+	define("GATE_ACCOUNT_INFO", "https://chatapi.viber.com/pa/get_account_info");
+	define("GATE_USER_DETAILS", "https://chatapi.viber.com/pa/get_user_details");
+	define("GATE_GET_ONLINE", "https://chatapi.viber.com/pa/get_online");
+	define("GATE_PA_POST", "https://chatapi.viber.com/pa/post");
+	define("LOCAL_GATE", "https://viberbot.ehost.tj/index.php/main/getImages/");
+	define("BOT_NAME", "Петька Воротилов");
+	define("BOT_AVATAR", "http://i99.beon.ru/cs7003.vk.me/c540105/v540105453/59cc/7t_OjCRjM2I.jpg");
+
+
+	$host = 'localhost'; // адрес сервера 
+	$database = 'c32viberbot'; // имя базы данных
+	$user = 'c32viberbot'; // имя пользователя
+	$password = 'donttouch911'; // пароль
+	
+	$db = mysql_connect("localhost", "c32viberbot", "donttouch911"); // данные пользователя
+	mysql_select_db ("c32viberbot",$db); // выбираем к какой БД подключаемся
+
+
+function send_post($gate, $json, $token){
+	if( $curl = curl_init() ) {
+		curl_setopt($curl, CURLOPT_URL, $gate);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER,true);
+		curl_setopt($curl, CURLOPT_POST, true);
+		curl_setopt($curl,CURLOPT_HTTPHEADER, array(
+			'X-Viber-Auth-Token: '.$token
+		));
+		curl_setopt($curl, CURLOPT_POSTFIELDS, $json);
+		$out = curl_exec($curl);
+		curl_close($curl);
+		$str = $json;
+		$fd = fopen("log.txt", 'a+') or die("не удалось открыть файл");
+		fwrite($fd, $str);
+		fclose($fd);
+		echo $out;
+	}
+}
+
+function intraspeak($gate, $json){
+	$post = json_decode($json);
+	if( $curl = curl_init() ) {
+		curl_setopt($curl, CURLOPT_URL, $gate);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER,true);
+		curl_setopt($curl, CURLOPT_POST, true);
+		curl_setopt($curl, CURLOPT_POSTFIELDS, $json);
+		$out = curl_exec($curl);
+		echo $out;
+		curl_close($curl);
+	  }
+}
+
+//$jsonf = '{}';
+//send_post(GATE_ACCOUNT_INFO,$jsonf,TOKEN);
+
+
+
+
+$post_body = implode("", file('php://input'));
+$json = json_decode($post_body);
+
+
+
+if($json->command == "post"){
+	$str = json_encode($json->body,JSON_UNESCAPED_SLASHES,JSON_UNESCAPED_UNICODE);
+	$fd = fopen("log.txt", 'a+') or die("не удалось открыть файл");
+	fwrite($fd, $str);
+	fclose($fd);
+	send_post(GATE_PA_POST,json_encode($json->body,JSON_UNESCAPED_SLASHES,JSON_UNESCAPED_UNICODE),TOKEN);
+	exit;
+}
+
+if($json->command == "get_info"){
+	send_post(GATE_ACCOUNT_INFO,'{}',TOKEN);
+	exit;
+}
+
+switch ($json->event){
+	case "conversation_started":
+		echo '{
+			"sender": {
+				"name": "'.BOT_NAME.'",
+				"avatar": "'.BOT_AVATAR.'"
+			},
+			"tracking_data": "tracking data",
+			"type": "text",
+			"text": "Я жду от тебя мега прикола!!!"
+		}';
+	break;
+	case "message":
+		if($json->message->type == "text"){
+			if($json->message->text == "car"){
+				$sender_id = $json->sender->id;
+				$jsonp = '{
+						"receiver": "'.$sender_id.'",
+						"min_api_version": 1,
+						"sender": {
+							"name": "'.BOT_NAME.'",
+							"avatar": "'.BOT_AVATAR.'"
+						},
+						"tracking_data": "tracking data",
+						"type": "text",
+						"text": "Благодарю тебя что поделился!",
+						"keyboard" : {
+							"Type": "keyboard",
+							"Buttons": [{
+								"Columns": 2,
+								"Rows": 2,
+								"ActionType": "reply",
+								"ActionBody": "Zepras_image",
+								"BgColor": "#f6f7f9",
+								"Image": "https://s14.postimg.org/pireym5h9/Restaurant01.png"
+							}, {
+								"Columns": 4,
+								"Rows": 2,
+								"Text": "<br><b>\u00A0\u00A0ZEPRAS</b><br>\u00A0\u00A0Minimum: 100 \u20BD Delivery: 10 \u20BD<br>\u00A0\u00A012:00 - 23:30<br>\u00A0\u00A0aprox. delivery time: 90 min.<br>\u00A0\u00A0Rating: 4 stars, 760 reviews",
+								"TextSize": "regular",
+								"TextHAlign": "left",
+								"TextVAlign": "top",
+								"ActionType": "reply",
+								"ActionBody": "Zepras_text",
+								"BgColor": "#f6f7f9"
+							}, {
+								"Columns": 2,
+								"Rows": 2,
+								"ActionType": "reply",
+								"ActionBody": "Giraffa_image",
+								"BgColor": "#f6f7f9",
+								"Image": "https://s14.postimg.org/otdojdb99/Restaurant02.png"
+							}, {
+								"Columns": 4,
+								"Rows": 2,
+								"Text": "<br><b>\u00A0\u00A0Giraffa</b><br>\u00A0\u00A0Minimum: 55 \u20BD Delivery: 10 \u20BD<br>\u00A0\u00A012:00 - 23:45<br>\u00A0\u00A0aprox. delivery time: 120 min.<br>\u00A0\u00A0Rating: 4.5 stars, 1300 reviews",
+								"TextSize": "regular",
+								"TextHAlign": "left",
+								"TextVAlign": "top",
+								"ActionType": "reply",
+								"ActionBody": "Giraffa_text",
+								"BgColor": "#f6f7f9"
+							}, {
+								"Columns": 2,
+								"Rows": 2,
+								"ActionType": "reply",
+								"ActionBody": "Giraffa_image",
+								"BgColor": "#f6f7f9",
+								"Image": "https://s14.postimg.org/otdojdb99/Restaurant02.png"
+							}, {
+								"Columns": 4,
+								"Rows": 2,
+								"Text": "<br><b>\u00A0\u00A0Giraffa</b><br>\u00A0\u00A0Minimum: 55 \u20BD Delivery: 10 \u20BD<br>\u00A0\u00A012:00 - 23:45<br>\u00A0\u00A0aprox. delivery time: 120 min.<br>\u00A0\u00A0Rating: 4.5 stars, 1300 reviews",
+								"TextSize": "regular",
+								"TextHAlign": "left",
+								"TextVAlign": "top",
+								"ActionType": "reply",
+								"ActionBody": "Giraffa_text",
+								"BgColor": "#f6f7f9"
+							}]
+
+						}
+
+					}';
+					send_post(GATE_SEND_MESSAGE,$jsonp, TOKEN);
+			}
+		}
+		if($json->message->type == "picture")
+		{
+			$sender_id = $json->sender->id;
+			$sender_name = $json->sender->name;
+			$message_media = $json->message->media;
+			$time = $json->timestamp;
+			
+			$jsonp = '{
+						"receiver": "'.$sender_id.'",
+						"min_api_version": 1,
+						"sender": {
+							"name": "'.BOT_NAME.'",
+							"avatar": "'.BOT_AVATAR.'"
+						},
+						"tracking_data": "tracking data",
+						"type": "text",
+						"text": "Благодарю тебя что поделился!"
+					}';
+			send_post(GATE_SEND_MESSAGE,$jsonp, TOKEN);
+			
+			//$jsonl = '{
+			//	"media_remout_url":"'.$message_media.'",
+			//	"media_owner_id":"'.$sender_id.'",
+			//	"media_owner_name":"'.$sender_name.'"
+			//}';
+			
+			$query ="INSERT INTO images (img_remout_url,img_owner_id,img_owner_name,img_added) VALUES('$message_media','$sender_id','$sender_name','".$time."')";
+			
+			//$str = $query;
+			//$fd = fopen("log.txt", 'a+') or die("не удалось открыть файл");
+			//fwrite($fd, $str);
+			//fclose($fd);
+			$host = 'localhost'; // адрес сервера 
+			$database = 'c32viberbot'; // имя базы данных
+			$user = 'c32viberbot'; // имя пользователя
+			$password = 'donttouch911'; // пароль
+			
+			$db = mysql_connect("localhost", "c32viberbot", "donttouch911"); // данные пользователя
+			mysql_select_db ("c32viberbot",$db); // выбираем к какой БД подключаемся
+			mysql_query("SET CHARACTER SET utf8 ");
+			//$convertedText = mb_convert_encoding($query, 'utf-8', mb_detect_encoding($query));
+			$result = mysql_query($query); 
+			mysql_close($db);
+
+			//intraspeak(LOCAL_GATE,$jsonl);
+		}
+	
+}
+
+
+
+
+
+?>
