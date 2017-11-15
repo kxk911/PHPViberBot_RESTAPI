@@ -75,10 +75,10 @@ $query_builder = TRUE;
 
 $db['default'] = array(
 	'dsn'	=> '',
-	'hostname' => 'localhost',
-	'username' => 'c32viberbot',
-	'password' => 'donttouch911',
-	'database' => 'c32viberbot',
+	'hostname' => '[DATABASE_HOST]',
+	'username' => '[DATABASE_LOGIN]',
+	'password' => '[DATABASE_PASSWORD]',
+	'database' => '[DATABASE_NAME]',
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
 	'pconnect' => FALSE,
